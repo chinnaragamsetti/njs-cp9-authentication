@@ -5,6 +5,7 @@ const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
 const bcrypt = require("bcrypt");
 const app = express();
+app.use(express.json());
 
 const dbPath = path.join(__dirname, "userData.db");
 
@@ -64,14 +65,14 @@ app.post("/login", async (request, response) => {
 
   if (dbUser === undefined) {
     response.status(400);
-    response.send("Invalid User");
+    response.send("Invalid user");
   } else {
     const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
     if (isPasswordMatched === true) {
-      response.send("Login Success!");
+      response.send("Login success!");
     } else {
       response.status(400);
-      response.send("Invalid Password");
+      response.send("Invalid password");
     }
   }
 });
@@ -81,7 +82,7 @@ app.put("/change-password", async (request, response) => {
   const selectUserQuery = `SELECT * FROM user WHERE username = '${username}'`;
   const dbUser = await db.get(selectUserQuery);
   const isPasswordMatched = await bcrypt.compare(oldPassword, dbUser.password);
-  const hashedNewPassword = await bcrypt.hash(oldPassword, 10);
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
   if (newPassword.length < 5) {
     response.status(400);
     response.send("Password is too short");
